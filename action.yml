@@ -1,0 +1,9 @@
+name: 'Pull Request Labeler'
+description: 'Adds and removes labels from pull request.'
+inputs:
+  github-token:
+    required: true
+    description: 'A GitHub access token with write access to the project.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
