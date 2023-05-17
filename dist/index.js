@@ -9786,12 +9786,12 @@ async function run() {
     const owner = payload.repository.owner.login;
     const pullRequestNumber = payload.number;
 
-    const labels = new Set();
-
     if (pullRequestNumber === undefined) {
       core.warning("No pull request number in payload.");
       return;
     }
+
+    const labels = new Set();
 
     const { data: pullRequest } = await octokit.rest.pulls.get({
       owner,
@@ -9836,6 +9836,19 @@ async function run() {
       repo,
       issue_number: pullRequestNumber,
       labels: Array.from(labels),
+    });
+
+    const { data: reviewers } = await octokit.rest.pulls.listRequestedReviewers({
+      owner,
+      repo,
+      pull_number: pullRequestNumber,
+    });
+
+    await octokit.rest.issues.addAssignees({
+      owner,
+      repo,
+      issue_number: pullRequestNumber,
+      assignees: reviewers.users.map(user => user.login),
     });
 
     core.notice(`Added labels to #${pullRequestNumber}.`);
