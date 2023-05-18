@@ -9819,6 +9819,7 @@ async function run() {
         repo,
         pull_number: pullRequestNumber,
       });
+      const assignees = [];
 
       for (const review of reviews) {
         debug(`Review data: ${JSON.stringify(review)}`)
@@ -9828,9 +9829,11 @@ async function run() {
           switch (review.state) {
             case "APPROVED":
               labels.add("approved");
+              assignees.push(review.user.login);
               break;
             case "CHANGES_REQUESTED":
               labels.add("changes required");
+              assignees.push(review.user.login);
           }
         }
       }
@@ -9840,6 +9843,13 @@ async function run() {
       } else if (!labels.has("approved")) {
         labels.add("🕵️‍♀️ needs review");
       }
+
+      await octokit.rest.issues.addAssignees({
+        owner,
+        repo,
+        issue_number: pullRequestNumber,
+        assignees,
+      });
     }
 
     await octokit.rest.issues.setLabels({
