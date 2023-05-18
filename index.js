@@ -27,6 +27,9 @@ async function run() {
     labels.delete("approved");
     labels.delete("changes required");
 
+    debug(`Pull request data: ${pullRequest}`)
+    debug(`Pull request author association: ${pullRequest["author_association"]}`)
+
     // if (pullRequest["author_association"].includes("CONTRIBUTOR")) {
     //   labels.add("contributor");
     // }
@@ -41,6 +44,9 @@ async function run() {
       });
 
       for (const review of reviews) {
+        debug(`Review data: ${review}`)
+        debug(`Review author association: ${review.user.login} ${review["author_association"]}`)
+
         if (review["author_association"] == "MEMBER" || review["author_association"] == "OWNER") {
           switch (review.state) {
             case "APPROVED":
@@ -86,3 +92,7 @@ async function run() {
 }
 
 run();
+
+function debug(msg) {
+  core.info(msg);
+}

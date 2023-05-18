@@ -9791,17 +9791,24 @@ async function run() {
       return;
     }
 
-    const labels = new Set();
-
     const { data: pullRequest } = await octokit.rest.pulls.get({
       owner,
       repo,
       pull_number: pullRequestNumber,
     });
 
-    if (pullRequest["author_association"].includes("CONTRIBUTOR")) {
-      labels.add("contributor");
-    }
+    const labels = new Set(pullRequest.labels.map(label => label.name));
+
+    labels.delete("work in progress");
+    labels.delete("approved");
+    labels.delete("changes required");
+
+    debug(`Pull request data: ${pullRequest}`)
+    debug(`Pull request author association: ${pullRequest["author_association"]}`)
+
+    // if (pullRequest["author_association"].includes("CONTRIBUTOR")) {
+    //   labels.add("contributor");
+    // }
 
     if (pullRequest.draft) {
       labels.add("work in progress");
@@ -9813,6 +9820,9 @@ async function run() {
       });
 
       for (const review of reviews) {
+        debug(`Review data: ${review}`)
+        debug(`Review author association: ${review.user.login} ${review["author_association"]}`)
+
         if (review["author_association"] == "MEMBER" || review["author_association"] == "OWNER") {
           switch (review.state) {
             case "APPROVED":
@@ -9858,6 +9868,10 @@ async function run() {
 }
 
 run();
+
+function debug(msg) {
+  core.info(msg);
+}
 
 })();
 
