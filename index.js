@@ -31,10 +31,6 @@ async function run() {
     debug(`Pull request data: ${JSON.stringify(pullRequest)}`)
     debug(`Pull request author association: ${pullRequest["author_association"]}`)
 
-    // if (pullRequest["author_association"].includes("CONTRIBUTOR")) {
-    //   labels.add("contributor");
-    // }
-
     if (pullRequest.draft) {
       labels.add("work in progress");
     } else {
@@ -49,16 +45,14 @@ async function run() {
         debug(`Review data: ${JSON.stringify(review)}`)
         debug(`Review author association: ${review.user.login} ${review["author_association"]}`)
 
-        if (review["author_association"] == "MEMBER" || review["author_association"] == "OWNER") {
-          switch (review.state) {
-            case "APPROVED":
-              labels.add("approved");
-              assignees.push(review.user.login);
-              break;
-            case "CHANGES_REQUESTED":
-              labels.add("changes required");
-              assignees.push(review.user.login);
-          }
+        switch (review.state) {
+          case "APPROVED":
+            labels.add("approved");
+            assignees.push(review.user.login);
+            break;
+          case "CHANGES_REQUESTED":
+            labels.add("changes required");
+            assignees.push(review.user.login);
         }
       }
 
