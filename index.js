@@ -26,6 +26,7 @@ async function run() {
     labels.delete("work in progress");
     labels.delete("approved");
     labels.delete("changes required");
+    labels.delete("🕵️‍♀️ needs review");
 
     debug(`Pull request data: ${pullRequest}`)
     debug(`Pull request author association: ${pullRequest["author_association"]}`)
