@@ -61,7 +61,7 @@ async function run() {
 
       if (labels.has("changes required")) {
         labels.delete("approved");
-      } else if (!labels.size) {
+      } else if (!labels.has("approved")) {
         labels.add("🕵️‍♀️ needs review");
       }
     }
