@@ -28,7 +28,7 @@ async function run() {
     labels.delete("changes required");
     labels.delete("🕵️‍♀️ needs review");
 
-    debug(`Pull request data: ${pullRequest}`)
+    debug(`Pull request data: ${JSON.stringify(pullRequest)}`)
     debug(`Pull request author association: ${pullRequest["author_association"]}`)
 
     // if (pullRequest["author_association"].includes("CONTRIBUTOR")) {
@@ -45,7 +45,7 @@ async function run() {
       });
 
       for (const review of reviews) {
-        debug(`Review data: ${review}`)
+        debug(`Review data: ${JSON.stringify(review)}`)
         debug(`Review author association: ${review.user.login} ${review["author_association"]}`)
 
         if (review["author_association"] == "MEMBER" || review["author_association"] == "OWNER") {
