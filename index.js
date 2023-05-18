@@ -21,14 +21,15 @@ async function run() {
       pull_number: pullRequestNumber,
     });
 
-    if (pullRequest["author_association"].includes("CONTRIBUTOR")) {
-      labels.add("contributor");
-    }
     const labels = new Set(pullRequest.labels.map(label => label.name));
 
     labels.delete("work in progress");
     labels.delete("approved");
     labels.delete("changes required");
+
+    // if (pullRequest["author_association"].includes("CONTRIBUTOR")) {
+    //   labels.add("contributor");
+    // }
 
     if (pullRequest.draft) {
       labels.add("work in progress");
