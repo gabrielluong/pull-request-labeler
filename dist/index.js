@@ -9804,8 +9804,7 @@ async function run() {
     labels.delete("changes required");
     labels.delete("🕵️‍♀️ needs review");
 
-    debug(`Pull request data: ${JSON.stringify(pullRequest)}`)
-    debug(`Pull request author association: ${pullRequest["author_association"]}`)
+    debug(`Pull request data: ${JSON.stringify(pullRequest)}`);
 
     if (pullRequest.draft) {
       labels.add("work in progress");
@@ -9815,26 +9814,27 @@ async function run() {
         repo,
         pull_number: pullRequestNumber,
       });
-      const assignees = [];
+
+      // Map of reviewers to their review feedback state.
+      const reviewers = new Map();
 
       for (const review of reviews) {
-        debug(`Review data: ${JSON.stringify(review)}`)
-        debug(`Review author association: ${review.user.login} ${review["author_association"]}`)
+        debug(`Review data: ${JSON.stringify(review)}`);
 
-        switch (review.state) {
-          case "APPROVED":
-            labels.add("approved");
-            assignees.push(review.user.login);
-            break;
-          case "CHANGES_REQUESTED":
-            labels.add("changes required");
-            assignees.push(review.user.login);
+        if (["APPROVED", "CHANGES_REQUESTED"].includes(review.state)) {
+          // Reviews are listed in chronological order - last reviews are more recent.
+          // Get the most recent review status for each reviewer.
+          reviewers.set(review.user.login, review.state);
         }
       }
 
-      if (labels.has("changes required")) {
-        labels.delete("approved");
-      } else if (!labels.has("approved")) {
+      const reviewState = [...reviewers.values()];
+
+      if (reviewState.includes("CHANGES REQUESTED")) {
+        labels.add("changes required");
+      } else if (reviewState.includes("APPROVED")) {
+        labels.add("approved");
+      } else {
         labels.add("🕵️‍♀️ needs review");
       }
 
@@ -9842,7 +9842,7 @@ async function run() {
         owner,
         repo,
         issue_number: pullRequestNumber,
-        assignees,
+        assignees: [...reviewers.keys()],
       });
     }
 
