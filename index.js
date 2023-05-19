@@ -10,7 +10,10 @@ async function run() {
     const owner = payload.repository.owner.login;
     const pullRequestNumber = payload["pull_request"].number;
 
-    if (pullRequestNumber === undefined) {
+    if (payload["pull_request"].user.type == "Bot") {
+      core.warning("Don't run actions for Bots.");
+      return;
+    } else if (pullRequestNumber === undefined) {
       core.warning("No pull request number in payload.");
       return;
     }
