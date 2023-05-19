@@ -9784,7 +9784,7 @@ async function run() {
     const payload = github.context.payload;
     const repo = payload.repository.name;
     const owner = payload.repository.owner.login;
-    const pullRequestNumber = payload.number;
+    const pullRequestNumber = payload["pull_request"].number;
 
     if (pullRequestNumber === undefined) {
       core.warning("No pull request number in payload.");
